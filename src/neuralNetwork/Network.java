@@ -2,6 +2,7 @@ package neuralNetwork;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Network {
 	private static final int numOfNeurons = 27;
@@ -22,5 +23,9 @@ public class Network {
 
 	public List<Neuron> getNeurons() {
 		return neurons;
+	}
+
+	public List<Double> getOutputs() {
+		return neurons.stream().map(n -> n.perdictedOutput()).collect(Collectors.toList());
 	}
 }

@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Neuron {
 	private ArrayList<Integer> inputs = new ArrayList<>();
-	private static double learningRate = 0.05;
+	private static double learningRate = 0.1;
 	private double weights[] = new double[1600];
 	private static int bias = 1;
 	private double biasWeight = Math.random();
@@ -27,10 +27,19 @@ public class Neuron {
 
 	public double perdictedOutput() {
 		double sum = 0;
-		for (int i = 0; i < inputs.size(); i++)
-			sum += inputs.get(i) * weights[i];
+		for (int i = 0; i < inputs.size(); i++) {
+			sum += (inputs.get(i) == 1 ? 1 : 0) * weights[i];
+		}
 		sum += bias * biasWeight;
 		return sigmoid(sum);
+	}
+
+	public double[] getWeights() {
+		return weights;
+	}
+
+	public double getBiasWeight() {
+		return bias * biasWeight;
 	}
 
 	public static double sigmoid(Double sum) {

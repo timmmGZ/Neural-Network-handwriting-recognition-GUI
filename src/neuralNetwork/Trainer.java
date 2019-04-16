@@ -1,19 +1,18 @@
 package neuralNetwork;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import repository.ReadWriteFile;
+import tool.ReadWriteFile;
 
 public class Trainer {
-	private Network network;
+	public Network network;
 	private List<TrainSet> trainSets;
 
 	public Trainer() throws IOException {
 		network = new Network();
-		trainSets = ReadWriteFile.readTrainingSets();
+		trainSets = ReadWriteFile.readTrainingSetsTxts();
+		train(2000);
 	}
 
 	public void train(int count) {
@@ -26,16 +25,8 @@ public class Trainer {
 		}).start();
 	}
 
-	public void setCurrentMapAsInputs(ArrayList<Integer> inputs) {
-		network.getNeurons().forEach(n -> n.setInputs(inputs));
-	}
-
 	public void addTrainSet(TrainSet newSet) {
 		trainSets.add(newSet);
-	}
-
-	public List<Double> getOutputs() {
-		return network.getNeurons().stream().map(n -> n.perdictedOutput()).collect(Collectors.toList());
 	}
 
 }

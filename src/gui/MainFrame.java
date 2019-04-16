@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.io.IOException;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
@@ -18,8 +19,8 @@ import javax.swing.SwingConstants;
 
 import neuralNetwork.TrainSet;
 import neuralNetwork.Trainer;
-import repository.ReadWriteFile;
-import repository.TrainSetsInfo;
+import tool.ReadWriteFile;
+import tool.TrainSetsInfo;
 
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -30,8 +31,9 @@ public class MainFrame extends JFrame {
 	ProbabilityPanel probPanel = new ProbabilityPanel(this, 27);
 	JLabel predict = new JLabel(" ?", SwingConstants.CENTER);
 	private JButton clearButton = new JButton("Clear");
+	private JButton randomDrawing = new JButton("Random drawing of->");
 	private JButton trainNetworkButton = new JButton("Train K times:");
-	private JButton addToTrainSetButton = new JButton("Add");
+	private JButton addToTrainSetButton = new JButton("<-Add to train set");
 	private JTextField trainingTimes = new JFormattedTextField("2000");
 	private JComboBox<String> trainSelection = new JComboBox<>(info.getTrainWordNamesArray());
 
@@ -40,10 +42,10 @@ public class MainFrame extends JFrame {
 	}
 
 	public MainFrame() throws IOException {
-		super("Word Recognization");
+		super("Hand Writing Recognization                                           --TimmmGZ");
 		setBottuns();
 		setLeft();
-		setProbPanel();
+		setRight();
 		pack();
 		setVisible(true);
 		setResizable(false);
@@ -62,6 +64,7 @@ public class MainFrame extends JFrame {
 	private void setLeftUp(JPanel jPanel) {
 		JPanel panel = new JPanel();
 		panel.setBackground(new Color(156, 206, 209));
+		panel.setBorder(BorderFactory.createEmptyBorder(33, 0, 33, 0));
 		panel.add(drawPanel);
 		jPanel.add(panel, BorderLayout.NORTH);
 	}
@@ -72,7 +75,7 @@ public class MainFrame extends JFrame {
 		panel.add(trainNetworkButton);
 		panel.add(trainingTimes);
 		panel.add(clearButton);
-		panel.add(new JLabel("Add to train set as:", SwingConstants.CENTER));
+		panel.add(randomDrawing);
 		panel.add(trainSelection);
 		panel.add(addToTrainSetButton);
 		jPanel.add(predict, BorderLayout.CENTER);
@@ -80,17 +83,22 @@ public class MainFrame extends JFrame {
 		jPanel.add(panel, BorderLayout.SOUTH);
 	}
 
-	private void setProbPanel() {
+	private void setRight() {
 		add(probPanel, BorderLayout.EAST);
 	}
 
 	private void setBottuns() {
-		clearButton.addActionListener(e -> drawPanel.clear());
+		randomDrawing.addActionListener(e -> {
+			drawPanel.drawRandomWord(this, (String) trainSelection.getSelectedItem());
+		});
+		clearButton.addActionListener(e -> {
+			drawPanel.clear();
+			predict.setText("?");
+		});
 		addToTrainSetButton.addActionListener(e -> {
 			String word = (String) trainSelection.getSelectedItem();
-			predict.setText("?");
 			trainer.addTrainSet(new TrainSet(drawPanel.mapToVector(), TrainSetsInfo.getTrueOutput(word)));
-			ReadWriteFile.saveToFile(drawPanel.mapToVector(), word);
+			ReadWriteFile.saveToTxt(drawPanel.mapToVector(), word);
 		});
 
 		trainNetworkButton.addActionListener(e -> {

@@ -3,7 +3,6 @@ package gui;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -12,11 +11,11 @@ import javax.swing.SwingUtilities;
 public class MouseDrawingListener extends DrawingPanel implements MouseMotionListener, MouseListener {
 
 	private static final long serialVersionUID = 1L;
-	MainFrame mainPanel;
+	MainFrame mainFrame;
 
 	public MouseDrawingListener(MainFrame m, int w, int h, int count) {
 		super(w, h, count);
-		mainPanel = m;
+		mainFrame = m;
 		addMouseMotionListener(this);
 		addMouseListener(this);
 	}
@@ -25,6 +24,11 @@ public class MouseDrawingListener extends DrawingPanel implements MouseMotionLis
 		try {
 			map[e.getY() / pixelH][e.getX() / pixelW] = SwingUtilities.isLeftMouseButton(e) ? 1 : 0;
 			repaint();
+			mainFrame.trainer.network.setAllNeuronsInputs(mapToVector());
+			List<Double> outputs = mainFrame.trainer.network.getOutputs();
+			mainFrame.probPanel.updateProbs();
+			mainFrame.predict
+					.setText(mainFrame.info.getTrainWordNames().get(outputs.indexOf(Collections.max(outputs))));
 		} catch (Exception exc) {
 		}
 	}
@@ -32,14 +36,6 @@ public class MouseDrawingListener extends DrawingPanel implements MouseMotionLis
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		setPixel(e);
-		mainPanel.trainer.setCurrentMapAsInputs(mapToVector());
-		List<Double> outputs = mainPanel.trainer.getOutputs();
-		int index = outputs.indexOf(Collections.max(outputs));
-		try {
-			mainPanel.probPanel.updateProbs();
-			mainPanel.predict.setText(mainPanel.info.getTrainWordNames().get(index));
-		} catch (IOException e1) {
-		}
 	}
 
 	@Override

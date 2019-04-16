@@ -1,24 +1,22 @@
 package gui;
 
-import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.swing.JPanel;
+import tool.RandomWordGenerator;
 
 public class DrawingPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	public int width;
-	public int pixelW;
-	public int height;
-	public int pixelH;
-	public int resolution;
+	public int pixelW, pixelH, resolution;
 	protected int[][] map;
 
 	public DrawingPanel(int w, int h, int c) {
 		super();
-		width = w;
-		height = h;
 		pixelW = w / c;
 		pixelH = h / c;
 		resolution = c;
@@ -35,36 +33,28 @@ public class DrawingPanel extends JPanel {
 			for (int x = 0; x < resolution; x++)
 				if (map[y][x] == 1)
 					g.fillRect(x * pixelW, y * pixelH, pixelW, pixelH);
-	}
-
-	public ArrayList<Integer> mapToVector() {
-		ArrayList<Integer> vector = new ArrayList<>();
+		g.setColor(Color.RED);
 		for (int y = 0; y < resolution; y++)
 			for (int x = 0; x < resolution; x++)
-				vector.add(map[y][x] == 1 ? 1 : 0);
-		return vector;
+				if (map[y][x] == 2)
+					g.fillRect(x * pixelW, y * pixelH, pixelW, pixelH);
 	}
 
-	public void cleasr() {
-		map = new int[resolution][resolution];
-		repaint();
-	}
+	public List<Integer> mapToVector() {
+		return Arrays.stream(map).map(Arrays::stream).map(e -> e.boxed()).flatMap(s -> s).collect(Collectors.toList());
+	}// map ->List<int[]> ->List<IntStream> ->List<Stream<Integer>> ->Stream<Integer>
 
 	public void clear() {
-		for (int y = 0; y < resolution; y++)
-			for (int x = 0; x < resolution; x++) {
-				System.out.print(map[y][x]);
-				map[y][x] = 0;
-			}
-		System.out.println();
 		map = new int[resolution][resolution];
 		repaint();
 	}
 
-	public void drawLetter(List<Integer> trueHLOutput) {
-		for (int i = 0; i < trueHLOutput.size(); i++)
-			map[i / resolution][i % resolution] = trueHLOutput.get(i) == 1 ? 1 : 0;
+	public void drawRandomWord(MainFrame frame, String word) {
+		try {
+			map = new RandomWordGenerator(frame.trainer.network.getNeurons() //
+					.get(frame.info.getTrainWordNames().indexOf(word))).randomDrawing(word);
+		} catch (IOException e) {
+		}
 		repaint();
 	}
-
 }
